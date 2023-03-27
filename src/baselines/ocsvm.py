@@ -85,8 +85,7 @@ class OCSVM(object):
                                 X_test[perm][labels[perm] == 1][:n_val_outlier]))
         labels = np.array([0] * n_val_normal + [1] * n_val_outlier)
 
-        i = 1
-        for gamma in gammas:
+        for i, gamma in enumerate(gammas, start=1):
 
             # Model candidate
             model = OneClassSVM(kernel=self.kernel, nu=self.nu, gamma=gamma)
@@ -111,8 +110,6 @@ class OCSVM(object):
                 self.model = model
                 self.gamma = gamma
                 self.results['train_time'] = train_time
-
-            i += 1
 
         # If hybrid, also train a model with linear kernel
         if self.hybrid:
@@ -189,9 +186,9 @@ class OCSVM(object):
         model_dict = torch.load(model_path, map_location='cpu')
         ae_net_dict = model_dict['ae_net_dict']
         if dataset_name in ['mnist', 'fmnist', 'cifar10']:
-            net_name = dataset_name + '_LeNet'
+            net_name = f'{dataset_name}_LeNet'
         else:
-            net_name = dataset_name + '_mlp'
+            net_name = f'{dataset_name}_mlp'
 
         if self.ae_net is None:
             self.ae_net = build_autoencoder(net_name)

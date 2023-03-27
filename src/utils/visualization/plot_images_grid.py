@@ -19,7 +19,7 @@ def plot_images_grid(x: torch.tensor, export_img, title: str = '', nrow=8, paddi
     ax.xaxis.set_visible(False)
     ax.yaxis.set_visible(False)
 
-    if not (title == ''):
+    if title:
         plt.title(title)
 
     plt.savefig(export_img, bbox_inches='tight', pad_inches=0.1)

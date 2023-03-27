@@ -25,10 +25,7 @@ class Stochastic(nn.Module):
         # std = exp(log_std)
         std = log_var.mul(0.5).exp_()
 
-        # z = std * epsilon + mu
-        z = mu.addcmul(std, epsilon)
-
-        return z
+        return mu.addcmul(std, epsilon)
 
     def forward(self, x):
         raise NotImplementedError

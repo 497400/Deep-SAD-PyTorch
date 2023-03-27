@@ -37,7 +37,7 @@ class ODDSDataset(Dataset):
         self.root = Path(root)
         self.dataset_name = dataset_name
         self.train = train  # training set or test set
-        self.file_name = self.dataset_name + '.mat'
+        self.file_name = f'{self.dataset_name}.mat'
         self.data_file = self.root / self.file_name
 
         if download:

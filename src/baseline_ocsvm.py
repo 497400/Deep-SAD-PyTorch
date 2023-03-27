@@ -65,19 +65,19 @@ def main(dataset_name, xp_path, data_path, load_config, load_model, ratio_known_
     logger = logging.getLogger()
     logger.setLevel(logging.INFO)
     formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-    log_file = xp_path + '/log.txt'
+    log_file = f'{xp_path}/log.txt'
     file_handler = logging.FileHandler(log_file)
     file_handler.setLevel(logging.INFO)
     file_handler.setFormatter(formatter)
     logger.addHandler(file_handler)
 
     # Print paths
-    logger.info('Log file is %s.' % log_file)
-    logger.info('Data path is %s.' % data_path)
-    logger.info('Export path is %s.' % xp_path)
+    logger.info(f'Log file is {log_file}.')
+    logger.info(f'Data path is {data_path}.')
+    logger.info(f'Export path is {xp_path}.')
 
     # Print experimental setup
-    logger.info('Dataset: %s' % dataset_name)
+    logger.info(f'Dataset: {dataset_name}')
     logger.info('Normal class: %d' % normal_class)
     logger.info('Ratio of labeled normal train samples: %.2f' % ratio_known_normal)
     logger.info('Ratio of labeled anomalous samples: %.2f' % ratio_known_outlier)
@@ -90,12 +90,12 @@ def main(dataset_name, xp_path, data_path, load_config, load_model, ratio_known_
     # If specified, load experiment config from JSON-file
     if load_config:
         cfg.load_config(import_json=load_config)
-        logger.info('Loaded configuration from %s.' % load_config)
+        logger.info(f'Loaded configuration from {load_config}.')
 
     # Print OC-SVM configuration
-    logger.info('OC-SVM kernel: %s' % cfg.settings['kernel'])
+    logger.info(f"OC-SVM kernel: {cfg.settings['kernel']}")
     logger.info('Nu-paramerter: %.2f' % cfg.settings['nu'])
-    logger.info('Hybrid model: %s' % cfg.settings['hybrid'])
+    logger.info(f"Hybrid model: {cfg.settings['hybrid']}")
 
     # Set seed
     if cfg.settings['seed'] != -1:
@@ -109,7 +109,7 @@ def main(dataset_name, xp_path, data_path, load_config, load_model, ratio_known_
     # Use 'cpu' as device for OC-SVM
     device = 'cpu'
     torch.multiprocessing.set_sharing_strategy('file_system')  # fix multiprocessing issue for ubuntu
-    logger.info('Computation device: %s' % device)
+    logger.info(f'Computation device: {device}')
     logger.info('Number of dataloader workers: %d' % n_jobs_dataloader)
 
     # Load data
@@ -118,7 +118,7 @@ def main(dataset_name, xp_path, data_path, load_config, load_model, ratio_known_
                            random_state=np.random.RandomState(cfg.settings['seed']))
     # Log random sample of known anomaly classes if more than 1 class
     if n_known_outlier_classes > 1:
-        logger.info('Known anomaly classes: %s' % (dataset.known_outlier_classes,))
+        logger.info(f'Known anomaly classes: {dataset.known_outlier_classes}')
 
     # Initialize OC-SVM model
     ocsvm = OCSVM(cfg.settings['kernel'], cfg.settings['nu'], cfg.settings['hybrid'])
@@ -126,12 +126,12 @@ def main(dataset_name, xp_path, data_path, load_config, load_model, ratio_known_
     # If specified, load model parameters from already trained model
     if load_model:
         ocsvm.load_model(import_path=load_model, device=device)
-        logger.info('Loading model from %s.' % load_model)
+        logger.info(f'Loading model from {load_model}.')
 
     # If specified, load model autoencoder weights for a hybrid approach
     if hybrid and load_ae is not None:
         ocsvm.load_ae(dataset_name, model_path=load_ae)
-        logger.info('Loaded pretrained autoencoder for features from %s.' % load_ae)
+        logger.info(f'Loaded pretrained autoencoder for features from {load_ae}.')
 
     # Train model on dataset
     ocsvm.train(dataset, device=device, n_jobs_dataloader=n_jobs_dataloader)
@@ -140,8 +140,8 @@ def main(dataset_name, xp_path, data_path, load_config, load_model, ratio_known_
     ocsvm.test(dataset, device=device, n_jobs_dataloader=n_jobs_dataloader)
 
     # Save results and configuration
-    ocsvm.save_results(export_json=xp_path + '/results.json')
-    cfg.save_config(export_json=xp_path + '/config.json')
+    ocsvm.save_results(export_json=f'{xp_path}/results.json')
+    cfg.save_config(export_json=f'{xp_path}/config.json')
 
     # Plot most anomalous and most normal test samples
     indices, labels, scores = zip(*ocsvm.results['test_scores'])
@@ -164,10 +164,12 @@ def main(dataset_name, xp_path, data_path, load_config, load_model, ratio_known_
             X_normal_high = torch.tensor(
                 np.transpose(dataset.test_set.data[idx_normal_sorted[-32:], ...], (0, 3, 1, 2)))
 
-        plot_images_grid(X_all_low, export_img=xp_path + '/all_low', padding=2)
-        plot_images_grid(X_all_high, export_img=xp_path + '/all_high', padding=2)
-        plot_images_grid(X_normal_low, export_img=xp_path + '/normals_low', padding=2)
-        plot_images_grid(X_normal_high, export_img=xp_path + '/normals_high', padding=2)
+        plot_images_grid(X_all_low, export_img=f'{xp_path}/all_low', padding=2)
+        plot_images_grid(X_all_high, export_img=f'{xp_path}/all_high', padding=2)
+        plot_images_grid(X_normal_low, export_img=f'{xp_path}/normals_low', padding=2)
+        plot_images_grid(
+            X_normal_high, export_img=f'{xp_path}/normals_high', padding=2
+        )
 
 
 if __name__ == '__main__':

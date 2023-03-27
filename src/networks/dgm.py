@@ -26,10 +26,7 @@ class Classifier(nn.Module):
             self.logits = nn.Linear(h_dim, y_dim)
 
     def forward(self, x):
-        if self.dims is None:
-            x = self.net(x)
-        else:
-            x = F.relu(self.dense(x))
+        x = self.net(x) if self.dims is None else F.relu(self.dense(x))
         x = F.softmax(self.logits(x), dim=-1)
         return x
 
@@ -66,13 +63,10 @@ class DeepGenerativeModel(VariationalAutoencoder):
     def forward(self, x, y):
         z, q_mu, q_log_var = self.encoder(torch.cat((x, y), dim=1))
         self.kl_divergence = self._kld(z, (q_mu, q_log_var))
-        rec = self.decoder(torch.cat((z, y), dim=1))
-
-        return rec
+        return self.decoder(torch.cat((z, y), dim=1))
 
     def classify(self, x):
-        logits = self.classifier(x)
-        return logits
+        return self.classifier(x)
 
     def sample(self, z, y):
         """
@@ -83,8 +77,7 @@ class DeepGenerativeModel(VariationalAutoencoder):
         :return: x
         """
         y = y.float()
-        x = self.decoder(torch.cat((z, y), dim=1))
-        return x
+        return self.decoder(torch.cat((z, y), dim=1))
 
 
 class StackedDeepGenerativeModel(DeepGenerativeModel):
@@ -119,5 +112,4 @@ class StackedDeepGenerativeModel(DeepGenerativeModel):
 
     def classify(self, x):
         _, x, _ = self.features.encoder(x)
-        logits = self.classifier(x)
-        return logits
+        return self.classifier(x)
