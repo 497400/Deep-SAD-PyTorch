@@ -91,19 +91,19 @@ def main(dataset_name, net_name, xp_path, data_path, load_config, load_model, et
     logger = logging.getLogger()
     logger.setLevel(logging.INFO)
     formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-    log_file = xp_path + '/log.txt'
+    log_file = f'{xp_path}/log.txt'
     file_handler = logging.FileHandler(log_file)
     file_handler.setLevel(logging.INFO)
     file_handler.setFormatter(formatter)
     logger.addHandler(file_handler)
 
     # Print paths
-    logger.info('Log file is %s' % log_file)
-    logger.info('Data path is %s' % data_path)
-    logger.info('Export path is %s' % xp_path)
+    logger.info(f'Log file is {log_file}')
+    logger.info(f'Data path is {data_path}')
+    logger.info(f'Export path is {xp_path}')
 
     # Print experimental setup
-    logger.info('Dataset: %s' % dataset_name)
+    logger.info(f'Dataset: {dataset_name}')
     logger.info('Normal class: %d' % normal_class)
     logger.info('Ratio of labeled normal train samples: %.2f' % ratio_known_normal)
     logger.info('Ratio of labeled anomalous samples: %.2f' % ratio_known_outlier)
@@ -112,12 +112,12 @@ def main(dataset_name, net_name, xp_path, data_path, load_config, load_model, et
         logger.info('Known anomaly class: %d' % known_outlier_class)
     else:
         logger.info('Number of known anomaly classes: %d' % n_known_outlier_classes)
-    logger.info('Network: %s' % net_name)
+    logger.info(f'Network: {net_name}')
 
     # If specified, load experiment config from JSON-file
     if load_config:
         cfg.load_config(import_json=load_config)
-        logger.info('Loaded configuration from %s.' % load_config)
+        logger.info(f'Loaded configuration from {load_config}.')
 
     # Print model configuration
     logger.info('Eta-parameter: %.2f' % cfg.settings['eta'])
@@ -137,7 +137,7 @@ def main(dataset_name, net_name, xp_path, data_path, load_config, load_model, et
     # Set the number of threads used for parallelizing CPU operations
     if num_threads > 0:
         torch.set_num_threads(num_threads)
-    logger.info('Computation device: %s' % device)
+    logger.info(f'Computation device: {device}')
     logger.info('Number of threads: %d' % num_threads)
     logger.info('Number of dataloader workers: %d' % n_jobs_dataloader)
 
@@ -147,7 +147,7 @@ def main(dataset_name, net_name, xp_path, data_path, load_config, load_model, et
                            random_state=np.random.RandomState(cfg.settings['seed']))
     # Log random sample of known anomaly classes if more than 1 class
     if n_known_outlier_classes > 1:
-        logger.info('Known anomaly classes: %s' % (dataset.known_outlier_classes,))
+        logger.info(f'Known anomaly classes: {dataset.known_outlier_classes}')
 
     # Initialize DeepSAD model and set neural network phi
     deepSAD = DeepSAD(cfg.settings['eta'])
@@ -156,15 +156,17 @@ def main(dataset_name, net_name, xp_path, data_path, load_config, load_model, et
     # If specified, load Deep SAD model (center c, network weights, and possibly autoencoder weights)
     if load_model:
         deepSAD.load_model(model_path=load_model, load_ae=True, map_location=device)
-        logger.info('Loading model from %s.' % load_model)
+        logger.info(f'Loading model from {load_model}.')
 
-    logger.info('Pretraining: %s' % pretrain)
+    logger.info(f'Pretraining: {pretrain}')
     if pretrain:
         # Log pretraining details
-        logger.info('Pretraining optimizer: %s' % cfg.settings['ae_optimizer_name'])
+        logger.info(f"Pretraining optimizer: {cfg.settings['ae_optimizer_name']}")
         logger.info('Pretraining learning rate: %g' % cfg.settings['ae_lr'])
         logger.info('Pretraining epochs: %d' % cfg.settings['ae_n_epochs'])
-        logger.info('Pretraining learning rate scheduler milestones: %s' % (cfg.settings['ae_lr_milestone'],))
+        logger.info(
+            f"Pretraining learning rate scheduler milestones: {cfg.settings['ae_lr_milestone']}"
+        )
         logger.info('Pretraining batch size: %d' % cfg.settings['ae_batch_size'])
         logger.info('Pretraining weight decay: %g' % cfg.settings['ae_weight_decay'])
 
@@ -180,13 +182,15 @@ def main(dataset_name, net_name, xp_path, data_path, load_config, load_model, et
                          n_jobs_dataloader=n_jobs_dataloader)
 
         # Save pretraining results
-        deepSAD.save_ae_results(export_json=xp_path + '/ae_results.json')
+        deepSAD.save_ae_results(export_json=f'{xp_path}/ae_results.json')
 
     # Log training details
-    logger.info('Training optimizer: %s' % cfg.settings['optimizer_name'])
+    logger.info(f"Training optimizer: {cfg.settings['optimizer_name']}")
     logger.info('Training learning rate: %g' % cfg.settings['lr'])
     logger.info('Training epochs: %d' % cfg.settings['n_epochs'])
-    logger.info('Training learning rate scheduler milestones: %s' % (cfg.settings['lr_milestone'],))
+    logger.info(
+        f"Training learning rate scheduler milestones: {cfg.settings['lr_milestone']}"
+    )
     logger.info('Training batch size: %d' % cfg.settings['batch_size'])
     logger.info('Training weight decay: %g' % cfg.settings['weight_decay'])
 
@@ -205,9 +209,9 @@ def main(dataset_name, net_name, xp_path, data_path, load_config, load_model, et
     deepSAD.test(dataset, device=device, n_jobs_dataloader=n_jobs_dataloader)
 
     # Save results, model, and configuration
-    deepSAD.save_results(export_json=xp_path + '/results.json')
-    deepSAD.save_model(export_model=xp_path + '/model.tar')
-    cfg.save_config(export_json=xp_path + '/config.json')
+    deepSAD.save_results(export_json=f'{xp_path}/results.json')
+    deepSAD.save_model(export_model=f'{xp_path}/model.tar')
+    cfg.save_config(export_json=f'{xp_path}/config.json')
 
     # Plot most anomalous and most normal test samples
     indices, labels, scores = zip(*deepSAD.results['test_scores'])
@@ -229,10 +233,12 @@ def main(dataset_name, net_name, xp_path, data_path, load_config, load_model, et
             X_normal_low = torch.tensor(np.transpose(dataset.test_set.data[idx_normal_sorted[:32], ...], (0,3,1,2)))
             X_normal_high = torch.tensor(np.transpose(dataset.test_set.data[idx_normal_sorted[-32:], ...], (0,3,1,2)))
 
-        plot_images_grid(X_all_low, export_img=xp_path + '/all_low', padding=2)
-        plot_images_grid(X_all_high, export_img=xp_path + '/all_high', padding=2)
-        plot_images_grid(X_normal_low, export_img=xp_path + '/normals_low', padding=2)
-        plot_images_grid(X_normal_high, export_img=xp_path + '/normals_high', padding=2)
+        plot_images_grid(X_all_low, export_img=f'{xp_path}/all_low', padding=2)
+        plot_images_grid(X_all_high, export_img=f'{xp_path}/all_high', padding=2)
+        plot_images_grid(X_normal_low, export_img=f'{xp_path}/normals_low', padding=2)
+        plot_images_grid(
+            X_normal_high, export_img=f'{xp_path}/normals_high', padding=2
+        )
 
 
 if __name__ == '__main__':

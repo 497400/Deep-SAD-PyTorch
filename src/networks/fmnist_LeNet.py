@@ -50,7 +50,7 @@ class FashionMNIST_LeNet_Decoder(BaseNet):
 
     def forward(self, x):
         x = self.bn1d2(self.fc3(x))
-        x = x.view(int(x.size(0)), int(128 / 16), 4, 4)
+        x = x.view(int(x.size(0)), 128 // 16, 4, 4)
         x = F.interpolate(F.leaky_relu(x), scale_factor=2)
         x = self.deconv1(x)
         x = F.interpolate(F.leaky_relu(self.bn2d3(x)), scale_factor=2)

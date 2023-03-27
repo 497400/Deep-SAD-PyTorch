@@ -132,9 +132,9 @@ class KDE(object):
         model_dict = torch.load(model_path, map_location='cpu')
         ae_net_dict = model_dict['ae_net_dict']
         if dataset_name in ['mnist', 'fmnist', 'cifar10']:
-            net_name = dataset_name + '_LeNet'
+            net_name = f'{dataset_name}_LeNet'
         else:
-            net_name = dataset_name + '_mlp'
+            net_name = f'{dataset_name}_mlp'
 
         if self.ae_net is None:
             self.ae_net = build_autoencoder(net_name)

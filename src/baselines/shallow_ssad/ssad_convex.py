@@ -88,7 +88,7 @@ class ConvexSSAD:
             eigs = np.linalg.eigvalsh(np.array(P))
             if eigs[0] < 0.0:
                 print('Smallest eigenvalue is {0}'.format(eigs[0]))
-                P += spdiag([-eigs[0] for i in range(N)])
+                P += spdiag([-eigs[0] for _ in range(N)])
 
         # there is no linear part of the objective
         q = matrix(0.0, (N, 1))
@@ -126,7 +126,7 @@ class ConvexSSAD:
         # these should sum to one
         print('Validate solution:')
         print('- found {0} support vectors'.format(len(self.svs)))
-        print('0 <= alpha_i : {0} of {1}'.format(np.sum(0. <= self.alphas), N))
+        print('0 <= alpha_i : {0} of {1}'.format(np.sum(self.alphas >= 0.), N))
         print('- sum_(i) alpha_i cy_i = {0} = 1.0'.format(np.sum(self.alphas*self.cy)))
         print('- sum_(i in sv) alpha_i cy_i = {0} ~ 1.0 (approx error)'.format(np.sum(self.alphas[self.svs]*self.cy[self.svs])))
         print('- sum_(i in labeled) alpha_i = {0} >= {1} = kappa'.format(np.sum(self.alphas[self.cl == 1]), self.kappa))

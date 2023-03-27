@@ -21,6 +21,6 @@ class BaseNet(nn.Module):
     def summary(self):
         """Network summary."""
         net_parameters = filter(lambda p: p.requires_grad, self.parameters())
-        params = sum([np.prod(p.size()) for p in net_parameters])
-        self.logger.info('Trainable parameters: {}'.format(params))
+        params = sum(np.prod(p.size()) for p in net_parameters)
+        self.logger.info(f'Trainable parameters: {params}')
         self.logger.info(self)

@@ -18,15 +18,15 @@ class CIFAR10_Dataset(TorchvisionDataset):
 
         # Define normal and outlier classes
         self.n_classes = 2  # 0: normal, 1: outlier
-        self.normal_classes = tuple([normal_class])
-        self.outlier_classes = list(range(0, 10))
+        self.normal_classes = (normal_class, )
+        self.outlier_classes = list(range(10))
         self.outlier_classes.remove(normal_class)
         self.outlier_classes = tuple(self.outlier_classes)
 
         if n_known_outlier_classes == 0:
             self.known_outlier_classes = ()
         elif n_known_outlier_classes == 1:
-            self.known_outlier_classes = tuple([known_outlier_class])
+            self.known_outlier_classes = (known_outlier_class, )
         else:
             self.known_outlier_classes = tuple(random.sample(self.outlier_classes, n_known_outlier_classes))
 

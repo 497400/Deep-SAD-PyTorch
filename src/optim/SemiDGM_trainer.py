@@ -137,6 +137,7 @@ class SemiDeepGenerativeTrainer(BaseTrainer):
         idx_label_score = []
         net.eval()
         with torch.no_grad():
+            eps = 1e-8
             for data in test_loader:
                 inputs, labels, _, idx = data
                 inputs = inputs.to(self.device)
@@ -156,7 +157,6 @@ class SemiDeepGenerativeTrainer(BaseTrainer):
                 U = -elbo(u)
 
                 logits = net.classify(u)
-                eps = 1e-8
                 classication_loss = -torch.sum(y_onehot * torch.log(logits + eps), dim=1).mean()
 
                 loss = L + self.alpha * classication_loss + U  # J_alpha

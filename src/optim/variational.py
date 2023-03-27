@@ -49,7 +49,7 @@ class SVI(nn.Module):
         self.beta = beta
 
     def forward(self, x, y=None):
-        is_labeled = False if y is None else True
+        is_labeled = y is not None
 
         # Prepare for sampling
         xs, ys = (x, y)

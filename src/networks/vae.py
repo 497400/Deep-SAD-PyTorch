@@ -114,9 +114,7 @@ class VariationalAutoencoder(nn.Module):
             (mu, log_var) = p_param
             pz = log_gaussian(z, mu, log_var)
 
-        kl = qz - pz
-
-        return kl
+        return qz - pz
 
     def add_flow(self, flow):
         self.flow = flow
@@ -131,9 +129,7 @@ class VariationalAutoencoder(nn.Module):
         """
         z, q_mu, q_log_var = self.encoder(x)
         self.kl_divergence = self._kld(z, (q_mu, q_log_var))
-        rec = self.decoder(z)
-
-        return rec
+        return self.decoder(z)
 
     def sample(self, z):
         """

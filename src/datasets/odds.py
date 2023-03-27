@@ -17,11 +17,7 @@ class ODDSADDataset(BaseADDataset):
         self.normal_classes = (0,)
         self.outlier_classes = (1,)
 
-        if n_known_outlier_classes == 0:
-            self.known_outlier_classes = ()
-        else:
-            self.known_outlier_classes = (1,)
-
+        self.known_outlier_classes = () if n_known_outlier_classes == 0 else (1, )
         # Get train set
         train_set = ODDSDataset(root=self.root, dataset_name=dataset_name, train=True, random_state=random_state,
                                 download=True)

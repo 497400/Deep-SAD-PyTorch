@@ -47,6 +47,4 @@ class Standardize(Module):
         return x
 
     def extra_repr(self):
-        return 'in_features={}, out_features={}, bias={}'.format(
-            self.in_features, self.out_features, self.mu is not None
-        )
+        return f'in_features={self.in_features}, out_features={self.out_features}, bias={self.mu is not None}'
